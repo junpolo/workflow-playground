@@ -15,14 +15,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Conventional Changelog Action
-        id: changelog
-        uses: TriPSs/conventional-changelog-action@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install git-cliff
+        run: |
+          curl -L https://github.com/orhun/git-cliff/releases/download/v2.1.0/git-cliff-2.1.0-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+          sudo mv git-cliff /usr/local/bin/
 
-      - name: Create Release Notes
-        if: ${{ steps.changelog.outputs.skipped == 'false' }}
-        run: gh release create ${{ github.ref }} --title "${{ steps.changelog.outputs.tag }}" --notes "${{ steps.changelog.outputs.clean_changelog }}"
+      - name: Generate Changelog
+        run: git-cliff --config cliff.toml --output changelog.md
+
+      - name: Create Release with Changelog
+        run: gh release create ${{ github.ref }} --title "${{ github.ref }}" --notes-file changelog.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit changelog to repository
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add changelog.md
+          git commit -m "chore(release): update changelog for ${{ github.ref }}"
+          git push
