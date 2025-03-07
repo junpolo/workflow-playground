@@ -14,16 +14,17 @@ jobs:
     name: Apply Semantic Version Bump
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "yarn"
+          cache: "npm"
+
+      - name: Switch to main branch
+        run: git checkout main
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
