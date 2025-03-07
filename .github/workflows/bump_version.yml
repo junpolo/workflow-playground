@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.DEPLOY_KEY}}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,9 +27,6 @@ jobs:
 
       - name: Switch to main branch
         run: git checkout main
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
 
       - name: Setup Git
         run: |
