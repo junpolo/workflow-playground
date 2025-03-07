@@ -1,6 +1,6 @@
 {
   "name": "workflow-package",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Workflow Package",
   "main": "index.js",
   "repository": "https://github.com/junpolo/workflow-playground.git",
