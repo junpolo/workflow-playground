@@ -1,0 +1,40 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Bump version (major / minor / patch)"
+        required: true
+        type: choice
+        options: [major, minor, patch]
+
+jobs:
+  bump_version:
+    name: Apply Semantic Version Bump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Setup Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Bump Version
+        run: npm version ${{  github.event.inputs.version }}
+
+      - name: Push latest version
+        run: git push oirgin main --follow-tags
