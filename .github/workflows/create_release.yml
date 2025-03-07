@@ -15,9 +15,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-    #   - name: Create Release Notes
-    #     run: gh release create ${{ github.ref }} --generate-notes
-    #     env:
-    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release Notes
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        run: gh release create ${{ github.ref }} --title "${{ steps.changelog.outputs.tag }}" --notes "${{ steps.changelog.outputs.clean_changelog }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
